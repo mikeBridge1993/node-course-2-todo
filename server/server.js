@@ -7,7 +7,6 @@ const {todo} = require("./models/todo");
 const {user} = require("./models/user");
 
 const app = express();
-console.log(process.env.PORT);
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
@@ -26,7 +25,8 @@ app.post('/todos', (req, res) => {
 
 
 app.get('/todos', (req, res) => {
-    
+    console.log(process.env.PORT);
+
     todo.find().then((todos) => {
         res.send({todos});  
     }, (e) => {
