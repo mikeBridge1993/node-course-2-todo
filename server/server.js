@@ -26,8 +26,8 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
     
-    todo.find().then((todos) => {
-        res.send({todos});  
+    todo.find().then((todo) => {
+        res.send({todo});  
     }, (e) => {
         res.status(400).send(e);
     });
@@ -40,12 +40,12 @@ app.get('/todos/:id', (req, res) => {
         res.status(404).send("ID not valid");
     }
     
-    todo.findById(req.params.id).then((todos) => {
+    todo.findById(req.params.id).then((todo) => {
         if(!todo){
             return res.status(404).send("ID not found in database"); 
         }
         
-        res.send({todos});    
+        res.send({todo});    
     }).catch((e) => {
         res.status(400).send('Error');
     });
@@ -59,12 +59,12 @@ app.delete('/todos/:id', (req, res) => {
         res.status(404).send("ID not valid");
     }
 
-    todo.findByIdAndRemove(req.params.id).then((removedTodo) => {
-        if(!removedTodo){
+    todo.findByIdAndRemove(req.params.id).then((todo) => {
+        if(!todo){
           return res.status(404).send("ID not found in database");     
         }
         
-        res.send(removedTodo)
+        res.send({todo})
     }).catch((e) => {
         res.status(400).send(e);
     });
