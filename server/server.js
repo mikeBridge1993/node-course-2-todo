@@ -25,8 +25,7 @@ app.post('/todos', (req, res) => {
 
 
 app.get('/todos', (req, res) => {
-    console.log(process.env.PORT);
-
+    
     todo.find().then((todos) => {
         res.send({todos});  
     }, (e) => {
@@ -42,12 +41,31 @@ app.get('/todos/:id', (req, res) => {
     }
     
     todo.findById(req.params.id).then((todos) => {
-        if(todos){
-            res.send({todos});     
-        }else{
-            res.status(404).send("ID not found in database");
-        }   
-    }, (e) => {
+        if(!todo){
+            return res.status(404).send("ID not found in database"); 
+        }
+        
+        res.send({todos});    
+    }).catch((e) => {
+        res.status(400).send('Error');
+    });
+});
+
+
+
+app.delete('/todos/:id', (req, res) => {
+    
+    if(!ObjectID.isValid(req.params.id)){ 
+        res.status(404).send("ID not valid");
+    }
+
+    todo.findByIdAndRemove(req.params.id).then((removedTodo) => {
+        if(!removedTodo){
+          return res.status(404).send("ID not found in database");     
+        }
+        
+        res.send(removedTodo)
+    }).catch((e) => {
         res.status(400).send(e);
     });
 });
