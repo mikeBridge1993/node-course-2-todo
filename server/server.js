@@ -98,8 +98,24 @@ app.patch('/todos/:id', (req, res) => {
     }).catch((e) => {
         res.status(400).send("Error");
     })
+});
 
 
+app.post('/users', (req, res) => {
+    
+    var body =_.pick(req.body, ['email', 'password']); //Using the pick method
+    
+    const newUser= new user(body);
+    
+    
+    newUser.save().then((doc) => {
+        return doc.generateAuthToken();
+//        res.send(user);
+    }).then((token) => {
+        res.header('x-auth', token).send(newUser);
+    }).catch((e) => {
+        res.status(400).send(e);
+    })
 });
 
 
