@@ -3,13 +3,12 @@ require('./config/config');
 const express = require('express');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
-
 const {mongoose} = require("./db/mongoose");
 const {ObjectID} = require('mongodb');
 const {todo} = require("./models/todo");
 const {user} = require("./models/user");
 const {authenticate} = require("./middleware/authenticate");
-
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const port = process.env.PORT;
@@ -125,6 +124,42 @@ app.post('/users', (req, res) => {
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
+
+
+
+
+
+app.post('/users/login', (req, res) => {
+    
+    var email  = req.body.email;
+    var password = req.body.password; //or use the pick method
+
+//    user.find({email}).then((doc) => { //andrew preferd to create another model method for this, so this was copied for find by credentials
+//        
+//        bcrypt.compare(password, doc[0].password, (err, resp) => {
+//            console.log(resp);
+//            if(resp == true){
+//                res.status(200).send(doc);
+//            } else {
+//                res.status(404).send(err);
+//            }
+//        });
+//    
+//    }, (e) => {
+//        res.status(400).send(e);
+//    });
+    
+    user.findByCredentials(email, password).then((doc) => {
+        
+       return doc.generateAuthToken().then((token) => { //return to keep chain alive, if err chain gets it. also, were 
+             res.header('x-auth', token).send(doc);
+        });
+        
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
 
 app.listen(port, () => {
     console.log("Started up on port", port);
