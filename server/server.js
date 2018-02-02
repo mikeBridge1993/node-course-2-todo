@@ -10,6 +10,7 @@ const {todo} = require("./models/todo");
 const {user} = require("./models/user");
 const {authenticate} = require("./middleware/authenticate");
 
+
 const app = express();
 const port = process.env.PORT;
 
@@ -48,10 +49,10 @@ app.get('/todos/:id', (req, res) => {
         if(!todo){
             return res.status(404).send("ID not found in database"); 
         }
-        
+          
         res.send({todo});    
     }).catch((e) => {
-        res.status(400).send('Error');
+        res.status(400).send();
     });
 });
 
@@ -70,7 +71,7 @@ app.delete('/todos/:id', (req, res) => {
         
         res.send({todo})
     }).catch((e) => {
-        res.status(400).send(e);
+        res.status(400).send();
     });
 });
 
