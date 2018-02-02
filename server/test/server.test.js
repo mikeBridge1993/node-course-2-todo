@@ -224,7 +224,7 @@ describe('POST /users', () => {
                 expect(doc).toBeTruthy();
                 expect(doc.password).not.toBe(password);
                 done();
-            })
+            }).catch((e) => done(e));
         });
         
     });
@@ -251,4 +251,59 @@ describe('POST /users', () => {
             .end(done)
        
     });
+});
+
+
+describe('POST /users/login', () => {
+    it('should login user and return auth token', (done) => {
+        var email = users[1].email;
+        var password =  users[1].password;
+        
+        request(app)
+            .post('/users/login')
+            .send({email, password})
+            .expect(200)
+            .expect((res) => {
+                expect(res.headers["x-auth"]).toBeTruthy();
+            })
+            .end((err, res) => {
+                if(err) {
+                    return done(err); //when we are testing successes we must check if there is unsucess
+                }
+            
+                user.findById(users[1]._id).then((doc) => {
+                    expect(doc.toObject().tokens[0]).toMatchObject({ //toObject due to new expect library version
+                        access: 'auth',
+                        token: res.headers['x-auth']
+                    }); 
+                    done();
+                    
+                }).catch((e) => done(e));
+        });
+    });
+    
+    it('should reject invalid login', (done) => {
+        var email = users[1].email;
+        var password =  users[1].password +"abc";
+        
+        request(app)
+            .post('/users/login')
+            .send({email, password})
+            .expect(400)
+            .expect((res) => {
+                expect(res.headers["x-auth"]).toBeFalsy();
+            })
+            .end((err, res) => {
+                if(err) {
+                    return done(err); //when we are testing successes we must check if there is unsucess
+                }
+            
+                user.findById(users[1]._id).then((doc) => {
+                    expect(doc.tokens.length).toBe(0); 
+                    done();
+                    
+                }).catch((e) => done(e));
+        });
+    });
+    
 });
